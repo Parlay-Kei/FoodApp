@@ -2,18 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface User {
   id: string;
-  [key: string]: any;
 }
 
 export default function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
   const [cartCount, setCartCount] = useState(0);
   const pathname = usePathname();
   const supabase = createClientComponentClient();

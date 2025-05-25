@@ -62,8 +62,8 @@ export default function AdminDashboard() {
         .gte('created_at', todayISOString);
         
       if (error) {
-        console.error('Error fetching today\'s orders:', error);
-        toast.error('Failed to load today\'s statistics');
+        console.error('Error fetching today&apos;s orders:', error);
+        toast.error('Failed to load today&apos;s statistics');
       } else {
         // Calculate statistics
         const stats = {
@@ -105,15 +105,15 @@ export default function AdminDashboard() {
       <main className="max-w-6xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
         
-        {/* Today's Stats */}
+        {/* Today&apos;s Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="card p-4 bg-primary bg-opacity-10">
-            <h3 className="text-sm font-medium text-gray-500">TODAY'S ORDERS</h3>
+            <h3 className="text-sm font-medium text-gray-500">TODAY&apos;S ORDERS</h3>
             <p className="text-3xl font-bold">{todayStats.totalOrders}</p>
           </div>
           
           <div className="card p-4 bg-secondary bg-opacity-10">
-            <h3 className="text-sm font-medium text-gray-500">TODAY'S REVENUE</h3>
+            <h3 className="text-sm font-medium text-gray-500">TODAY&apos;S REVENUE</h3>
             <p className="text-3xl font-bold">${todayStats.revenue.toFixed(2)}</p>
           </div>
           
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold mb-2">Today's Orders</h2>
+            <h2 className="text-xl font-semibold mb-2">Today&apos;s Orders</h2>
             <p className="text-gray-600">
               Manage incoming orders, update status, and track pickup times.
             </p>

@@ -119,7 +119,7 @@ export default function OrderStatus() {
       default:
         return {
           label: 'Unknown Status',
-          description: 'We\'re having trouble determining the status of your order.',
+          description: 'We&apos;re having trouble determining the status of your order.',
           color: 'gray',
           step: 0
         };
@@ -143,7 +143,7 @@ export default function OrderStatus() {
         <Navbar />
         <div className="max-w-4xl mx-auto p-4 text-center py-10">
           <h1 className="text-2xl font-bold mb-4">Order Not Found</h1>
-          <p className="mb-6">We couldn't find the order you're looking for.</p>
+          <p className="mb-6">We couldn&apos;t find the order you&apos;re looking for.</p>
           <Link href="/menu" className="btn-primary">
             Return to Menu
           </Link>

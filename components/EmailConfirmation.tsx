@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-interface EmailConfirmationProps {
-  orderId: string;
-  userEmail: string;
-}
-
-export default function EmailConfirmation({ orderId, userEmail }: EmailConfirmationProps) {
+export default function EmailConfirmation() {
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
 

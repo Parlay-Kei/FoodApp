@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import Navbar from '../../components/Navbar';
@@ -11,7 +11,6 @@ export default function OrderConfirmation() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('id');
   const total = searchParams.get('total') || '0.00';
@@ -74,7 +73,7 @@ export default function OrderConfirmation() {
         <Navbar />
         <div className="max-w-4xl mx-auto p-4 text-center py-10">
           <h1 className="text-2xl font-bold mb-4">Order Not Found</h1>
-          <p className="mb-6">We couldn't find the order you're looking for.</p>
+          <p className="mb-6">We couldn&apos;t find the order you&apos;re looking for.</p>
           <Link href="/menu" className="btn-primary">
             Return to Menu
           </Link>

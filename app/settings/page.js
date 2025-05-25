@@ -47,13 +47,14 @@ export default function Settings() {
         
       if (error) {
         console.error('Error fetching profile:', error);
+        toast.error('Failed to load profile');
       } else if (data) {
-        setFormData({
-          ...formData,
+        setFormData(prevData => ({
+          ...prevData,
           email: user.email || '',
           phone: user.phone || data.phone || '',
           receive_sms: data.receive_sms || false
-        });
+        }));
       }
       
       setLoading(false);

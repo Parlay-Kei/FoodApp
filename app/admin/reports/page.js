@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -18,39 +18,30 @@ export default function AdminReports() {
   const router = useRouter();
   const supabase = createClientComponentClient();
 
-  useEffect(() => {
-    // Check if user is logged in and is an admin
-    async function checkAdminStatus() {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error('Please login to access this page');
-        router.push('/login');
-        return;
-      }
-      
-      // Check if user is an admin
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
-        
-      if (error || !data || !data.is_admin) {
-        toast.error('You do not have permission to access this page');
-        router.push('/menu');
-        return;
-      }
-      
-      setIsAdmin(true);
-      fetchReportData();
-    }
+  // Group sales data by day
+  const groupSalesByDay = useCallback((orders) => {
+    const grouped = {};
     
-    checkAdminStatus();
-  }, [router, supabase]);
+    orders.forEach(order => {
+      const date = new Date(order.created_at).toLocaleDateString();
+      
+      if (!grouped[date]) {
+        grouped[date] = {
+          date,
+          total: 0,
+          count: 0
+        };
+      }
+      
+      grouped[date].total += order.total;
+      grouped[date].count += 1;
+    });
+    
+    return Object.values(grouped);
+  }, []);
 
   // Fetch report data based on selected date range
-  const fetchReportData = async () => {
+  const fetchReportData = useCallback(async () => {
     setLoading(true);
     
     try {
@@ -109,29 +100,38 @@ export default function AdminReports() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange, supabase, groupSalesByDay]);
 
-  // Group sales data by day
-  const groupSalesByDay = (orders) => {
-    const grouped = {};
+  // Check admin status
+  const checkAdminStatus = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
     
-    orders.forEach(order => {
-      const date = new Date(order.created_at).toLocaleDateString();
-      
-      if (!grouped[date]) {
-        grouped[date] = {
-          date,
-          total: 0,
-          count: 0
-        };
-      }
-      
-      grouped[date].total += order.total;
-      grouped[date].count += 1;
-    });
+    if (!user) {
+      toast.error('Please login to access this page');
+      router.push('/login');
+      return;
+    }
     
-    return Object.values(grouped);
-  };
+    // Check if user is an admin
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+      
+    if (error || !data || !data.is_admin) {
+      toast.error('You do not have permission to access this page');
+      router.push('/menu');
+      return;
+    }
+    
+    setIsAdmin(true);
+    fetchReportData();
+  }, [supabase, router, fetchReportData]);
+
+  useEffect(() => {
+    checkAdminStatus();
+  }, [checkAdminStatus]);
 
   // Handle date range change
   const handleDateRangeChange = (range) => {
@@ -189,7 +189,7 @@ export default function AdminReports() {
       
       <main className="max-w-6xl mx-auto p-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Inventory & Reports</h1>
+          <h1 className="text-2xl font-bold">Inventory &amp; Reports</h1>
           
           <Link href="/admin" className="text-primary hover:underline">
             &larr; Back to Dashboard

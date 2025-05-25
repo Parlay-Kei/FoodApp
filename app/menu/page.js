@@ -107,7 +107,7 @@ export default function Menu() {
       
       <main className="max-w-6xl mx-auto p-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Today's Menu</h1>
+          <h1 className="text-2xl font-bold">Today&apos;s Menu</h1>
           
           <div className="flex space-x-2 overflow-x-auto pb-2">
             <button 

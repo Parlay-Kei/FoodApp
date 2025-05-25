@@ -66,8 +66,8 @@ export default function AdminOrders() {
         .order('pickup_time', { ascending: true });
         
       if (error) {
-        console.error('Error fetching today\'s orders:', error);
-        toast.error('Failed to load today\'s orders');
+        console.error('Error fetching today&apos;s orders:', error);
+        toast.error('Failed to load today&apos;s orders');
       } else {
         setOrders(data || []);
       }
@@ -84,7 +84,7 @@ export default function AdminOrders() {
         event: '*',
         schema: 'public',
         table: 'orders'
-      }, (payload) => {
+      }, () => {
         fetchTodaysOrders();
       })
       .subscribe();
@@ -154,7 +154,7 @@ export default function AdminOrders() {
       
       <main className="max-w-6xl mx-auto p-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Today's Orders</h1>
+          <h1 className="text-2xl font-bold">Today&apos;s Orders</h1>
           
           <Link href="/admin" className="text-primary hover:underline">
             &larr; Back to Dashboard

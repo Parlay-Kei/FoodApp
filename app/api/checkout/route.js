@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 
 // This is a simplified version that will always succeed
-export async function POST(request) {
+export async function POST() {
   try {
     console.log('Simplified checkout API called');
     

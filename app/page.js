@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-gray-100 p-4">
       <div className="max-w-md w-full text-center">
-        <h1 className="text-4xl font-bold text-dark mb-6">Megan's Munchies</h1>
+        <h1 className="text-4xl font-bold text-dark mb-6">Megan&apos;s Munchies</h1>
         <p className="text-lg text-gray-600 mb-8">
           Order delicious food from your favorite food truck and skip the line!
         </p>
