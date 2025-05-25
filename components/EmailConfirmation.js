@@ -5,23 +5,16 @@ export default function EmailConfirmation({ orderId, userEmail }) {
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const sendConfirmationEmail = async () => {
+  const sendConfirmationEmail = () => {
     setLoading(true);
     
-    try {
-      // In a real app, this would call an API endpoint to send an email
-      // For now, we'll just simulate a successful email send
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate success
+    // Simple timeout to simulate sending an email
+    // No async/await to avoid potential issues
+    setTimeout(() => {
       setEmailSent(true);
-      toast.success('Confirmation email sent!');
-    } catch (error) {
-      console.error('Error sending confirmation email:', error);
-      toast.error('Failed to send confirmation email. Please try again.');
-    } finally {
       setLoading(false);
-    }
+      toast.success('Confirmation email sent!');
+    }, 1000);
   };
 
   return (
