@@ -1,4 +1,5 @@
 import { createUserProfile, createSupabaseClient } from '../../../../lib/supabase';
+import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try {

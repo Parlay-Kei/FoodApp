@@ -1,5 +1,7 @@
 // Ultra-simplified checkout API that always returns success
+import { NextResponse } from 'next/server';
 
+// This is a simplified version that will always succeed
 export async function POST(request) {
   try {
     console.log('Simplified checkout API called');
@@ -17,7 +19,7 @@ export async function POST(request) {
     };
     
     // Always return success
-    return Response.json({ order, success: true });
+    return NextResponse.json({ order, success: true });
   } catch (error) {
     console.error('Checkout error:', error);
     
@@ -31,6 +33,6 @@ export async function POST(request) {
       pickup_time: new Date(Date.now() + 30 * 60000).toISOString()
     };
     
-    return Response.json({ order, success: true });
+    return NextResponse.json({ order, success: true });
   }
 }

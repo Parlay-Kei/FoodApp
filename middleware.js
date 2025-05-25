@@ -2,28 +2,9 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 
 export async function middleware(req) {
-  // Skip middleware for static assets and API routes to prevent potential errors
-  const url = req.nextUrl.clone();
-  if (
-    url.pathname.startsWith('/_next') || 
-    url.pathname.startsWith('/api/') ||
-    url.pathname.includes('.') ||
-    url.pathname === '/'
-  ) {
-    return NextResponse.next();
-  }
-  
   try {
     const res = NextResponse.next();
-    
-    // Create Supabase client with error handling
-    let supabase;
-    try {
-      supabase = createMiddlewareClient({ req, res });
-    } catch (clientError) {
-      console.error('Error creating middleware Supabase client:', clientError);
-      return NextResponse.next();
-    }
+    const supabase = createMiddlewareClient({ req, res });
 
     // Refresh session if expired - with error handling
     try {
@@ -66,14 +47,12 @@ export async function middleware(req) {
 export const config = {
   matcher: [
     /*
-     * Only run middleware on routes that require authentication
-     * This helps prevent unnecessary Supabase calls
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public (public files)
      */
-    '/menu/:path*',
-    '/cart/:path*',
-    '/order-history/:path*',
-    '/order-status/:path*',
-    '/settings/:path*',
-    '/admin/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|public).*)',
   ],
 };

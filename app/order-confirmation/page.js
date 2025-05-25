@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import Navbar from '../../components/Navbar';
@@ -11,27 +11,42 @@ export default function OrderConfirmation() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   
+  const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('id');
   const total = searchParams.get('total') || '0.00';
   
   // Use effect to create a static order object
   useEffect(() => {
-    // Create a static order object based on URL parameters
-    const staticOrder = {
-      id: orderId || 'mock-' + Date.now().toString(),
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      total: total,
-      pickup_time: new Date(Date.now() + 30 * 60000).toISOString() // 30 minutes from now
-    };
+    // Safety check - we'll handle the redirect in the UI instead of using router.push
+    // to avoid client/server mismatches
+    if (!orderId) {
+      setLoading(false);
+      return;
+    }
     
-    // Set the order and finish loading
-    setOrder(staticOrder);
-    setLoading(false);
-    
-    // Show a success toast
-    toast.success('Order placed successfully!');
+    try {
+      // Create a static order object based on URL parameters
+      const staticOrder = {
+        id: orderId,
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        total: total,
+        pickup_time: new Date(Date.now() + 30 * 60000).toISOString() // 30 minutes from now
+      };
+      
+      // Set the order and finish loading
+      setOrder(staticOrder);
+      
+      // Show a success toast - only on client side
+      if (typeof window !== 'undefined') {
+        toast.success('Order placed successfully!');
+      }
+    } catch (error) {
+      console.error('Error creating order object:', error);
+    } finally {
+      setLoading(false);
+    }
   }, [orderId, total]);
 
   // Format date for display
