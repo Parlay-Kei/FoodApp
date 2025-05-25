@@ -1,8 +1,21 @@
-"use client";
-
 import Image from 'next/image';
 
-export default function CartItem({ item, onUpdateQuantity, onRemove }) {
+export interface CartItemType {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  max_quantity: number;
+  image?: string;
+}
+
+interface CartItemProps {
+  item: CartItemType;
+  onUpdateQuantity: (id: string, newQuantity: number) => void;
+  onRemove: (id: string) => void;
+}
+
+export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
   return (
     <div className="p-4 flex">
       <div className="relative h-20 w-20 flex-shrink-0">
@@ -52,4 +65,4 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }) {
       </div>
     </div>
   );
-}
+} 

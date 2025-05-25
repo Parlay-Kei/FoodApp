@@ -1,8 +1,10 @@
-"use client";
-
 import { getOrderStatusInfo } from '../lib/utils';
 
-export default function OrderStatusTracker({ status }) {
+interface OrderStatusTrackerProps {
+  status: string;
+}
+
+export default function OrderStatusTracker({ status }: OrderStatusTrackerProps) {
   const statusInfo = getOrderStatusInfo(status);
 
   return (
@@ -48,4 +50,4 @@ export default function OrderStatusTracker({ status }) {
       </div>
     </div>
   );
-}
+} 

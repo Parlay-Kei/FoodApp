@@ -1,17 +1,30 @@
-"use client";
-
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 
-export default function FoodItemCard({ item, onAddToCart }) {
+export interface FoodItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image_url?: string;
+  is_vegan?: boolean;
+  is_vegetarian?: boolean;
+  is_spicy?: boolean;
+  is_gluten_free?: boolean;
+  quantity_available: number;
+}
+
+interface FoodItemCardProps {
+  item: FoodItem;
+  onAddToCart: (item: FoodItem) => void;
+}
+
+export default function FoodItemCard({ item, onAddToCart }: FoodItemCardProps) {
   const handleAddToCart = () => {
-    // Check if item is sold out
     if (item.quantity_available <= 0) {
       toast.error(`${item.name} is sold out!`);
       return;
     }
-    
-    // Call the provided callback function
     onAddToCart(item);
   };
 
@@ -24,13 +37,11 @@ export default function FoodItemCard({ item, onAddToCart }) {
           fill
           style={{ objectFit: 'cover' }}
         />
-        
         {item.quantity_available <= 0 && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <span className="text-white font-bold text-xl">SOLD OUT</span>
           </div>
         )}
-        
         <div className="absolute top-2 right-2 flex flex-wrap gap-1 max-w-[80%]">
           {item.is_vegan && (
             <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
@@ -54,7 +65,6 @@ export default function FoodItemCard({ item, onAddToCart }) {
           )}
         </div>
       </div>
-      
       <div className="p-4 flex-grow flex flex-col">
         <div className="flex justify-between items-start mb-2">
           <div>
@@ -63,14 +73,12 @@ export default function FoodItemCard({ item, onAddToCart }) {
           </div>
           <span className="font-bold text-lg">${item.price.toFixed(2)}</span>
         </div>
-        
         <div className="mt-auto pt-4 flex justify-between items-center">
           {item.quantity_available > 0 ? (
             <span className="text-sm text-gray-500">{item.quantity_available} available</span>
           ) : (
             <span className="text-sm text-red-500">Sold out</span>
           )}
-          
           <button 
             onClick={handleAddToCart}
             disabled={item.quantity_available <= 0}
@@ -84,4 +92,4 @@ export default function FoodItemCard({ item, onAddToCart }) {
       </div>
     </div>
   );
-}
+} 

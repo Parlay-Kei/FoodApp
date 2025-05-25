@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-export default function EmailConfirmation({ orderId, userEmail }) {
+interface EmailConfirmationProps {
+  orderId: string;
+  userEmail: string;
+}
+
+export default function EmailConfirmation({ orderId, userEmail }: EmailConfirmationProps) {
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const sendConfirmationEmail = () => {
     setLoading(true);
-    
-    // Simple timeout to simulate sending an email
-    // No async/await to avoid potential issues
     setTimeout(() => {
       setEmailSent(true);
       setLoading(false);
@@ -35,4 +37,4 @@ export default function EmailConfirmation({ orderId, userEmail }) {
       )}
     </div>
   );
-}
+} 
