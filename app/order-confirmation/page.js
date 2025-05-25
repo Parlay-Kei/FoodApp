@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { toast } from 'react-hot-toast';
 import Navbar from '../../components/Navbar';
+import EmailConfirmation from '../../components/EmailConfirmation';
 
 export default function OrderConfirmation() {
   const [order, setOrder] = useState(null);
@@ -161,7 +162,19 @@ export default function OrderConfirmation() {
           </div>
         </div>
         
-        <div className="flex justify-center space-x-4">
+        <div className="card p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Order Confirmation</h2>
+          <p className="mb-4">
+            Would you like to receive an email confirmation for your order?
+          </p>
+          
+          {/* Import the EmailConfirmation component */}
+          <div className="mt-4">
+            <EmailConfirmation orderId={orderId} userEmail="" />
+          </div>
+        </div>
+        
+        <div className="flex justify-center space-x-4 mb-8">
           <Link href={`/order-status?id=${orderId}`} className="btn-primary">
             Track Order
           </Link>
