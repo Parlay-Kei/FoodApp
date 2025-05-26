@@ -100,13 +100,13 @@ export default function Login() {
         <div className="flex justify-center space-x-4 mb-6">
           <button 
             onClick={() => setMethod('email')} 
-            className={`px-4 py-2 rounded-full ${method === 'email' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+            className={`btn-outline ${method === 'email' ? 'btn-primary text-white' : ''}`}
           >
             Email
           </button>
           <button 
             onClick={() => setMethod('phone')} 
-            className={`px-4 py-2 rounded-full ${method === 'phone' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+            className={`btn-outline ${method === 'phone' ? 'btn-primary text-white' : ''}`}
           >
             Phone
           </button>

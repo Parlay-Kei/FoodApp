@@ -1,4 +1,5 @@
 import './globals.css';
+import Footer from '../components/Footer';
 
 export const metadata = {
   title: 'Megan\'s Munchies',
@@ -10,6 +11,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         {children}
+        <Footer />
       </body>
     </html>
   );

@@ -57,24 +57,27 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-navy text-white shadow-md">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+        <div className="flex justify-between items-center h-20">
+          <div className="flex flex-col items-start justify-center">
             <Link href="/menu" className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-primary">Food Truck</span>
+              <span className="text-2xl font-bold text-white flex items-center">
+                <span className="mr-2">🚚</span> Megan's Munchies
+              </span>
             </Link>
+            <span className="text-sm text-green font-normal mt-1 ml-8">Fresh Off the Truck. Right on Time.</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link 
               href="/menu" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/menu' ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/menu' ? 'bg-orange-100 text-primary' : 'text-white hover:text-orange-200'}`}
             >
               Menu
             </Link>
             <Link 
               href="/cart" 
-              className="relative px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary"
+              className="relative px-3 py-2 rounded-md text-sm font-medium text-white hover:text-orange-200"
             >
               Cart
               {cartCount > 0 && (
@@ -85,27 +88,27 @@ export default function Navbar() {
             </Link>
             <Link 
               href="/order-history" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/order-history' ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/order-history' ? 'bg-orange-100 text-primary' : 'text-white hover:text-orange-200'}`}
             >
               Orders
             </Link>
             {isAdmin && (
               <Link 
                 href="/admin" 
-                className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/admin') ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/admin') ? 'bg-orange-100 text-primary' : 'text-white hover:text-orange-200'}`}
               >
                 Admin
               </Link>
             )}
             <Link 
               href="/settings" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/settings' ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/settings' ? 'bg-orange-100 text-primary' : 'text-white hover:text-orange-200'}`}
             >
               Settings
             </Link>
             <button 
               onClick={handleSignOut}
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary"
+              className="px-3 py-2 rounded-md text-sm font-medium text-white hover:text-orange-200"
             >
               Sign Out
             </button>
