@@ -8,17 +8,25 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#FF7A3D',
-        beige: '#FFF3E6',
+        primary: '#D72687', // Royale Pink
+        secondary: '#FF4C91', // Gradient start
+        accent: '#FFD447', // CTA Yellow
+        background: '#FFF5E5', // Background
+        text: '#2C003E', // Text color
+        tag: '#51C495', // Tag accent
+        // Keep some existing colors for backward compatibility
         navy: '#0B2C4A',
         green: '#6DBE45',
         red: '#D32F2F',
-        background: '#FFF3E6',
-        dark: '#0B2C4A',
-        accent: '#D32F2F',
+        dark: '#2C003E',
       },
       fontFamily: {
-        sans: ['\'Nunito Sans\'', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Mulish', 'Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Playfair Display', 'Rasa', 'serif'],
+        display: ['Amandine', 'Playfair Display', 'serif'], // For headings
+      },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(to right, #FF4C91, #D72687)',
       },
     },
   },

@@ -6,6 +6,9 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config({ path: './.env.local' });
 
+// Check if force update flag is passed
+const forceUpdate = process.argv.includes('--force');
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -76,6 +79,42 @@ const sampleMenuItems = [
     is_gluten_free: false,
     available_today: true,
     quantity_available: 12
+  },
+  {
+    name: "Baked Chicken Wings",
+    description: "Crispy oven-baked chicken wings seasoned with our signature spice blend",
+    price: 12.99,
+    image_url: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?q=80&w=1000&auto=format&fit=crop",
+    is_vegan: false,
+    is_vegetarian: false,
+    is_spicy: true,
+    is_gluten_free: true,
+    available_today: true,
+    quantity_available: 15
+  },
+  {
+    name: "Cornbread",
+    description: "Homemade sweet cornbread with honey butter, freshly baked daily",
+    price: 4.99,
+    image_url: "https://images.unsplash.com/photo-1621510007845-3bd6dbc91c57?q=80&w=1000&auto=format&fit=crop",
+    is_vegan: false,
+    is_vegetarian: true,
+    is_spicy: false,
+    is_gluten_free: false,
+    available_today: true,
+    quantity_available: 20
+  },
+  {
+    name: "Red Beans and Rice w/Sausage",
+    description: "Slow-cooked red beans with smoked sausage, served over fluffy white rice with Cajun seasoning",
+    price: 9.99,
+    image_url: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?q=80&w=1000&auto=format&fit=crop",
+    is_vegan: false,
+    is_vegetarian: false,
+    is_spicy: true,
+    is_gluten_free: true,
+    available_today: true,
+    quantity_available: 18
   }
 ];
 
@@ -107,11 +146,44 @@ async function seedDatabase() {
       throw new Error(`Failed to check existing items: ${checkError.message}`);
     }
     
-    // If items already exist, skip insertion to avoid duplicates
-    if (existingItems && existingItems.length > 0) {
+    // If items already exist and force update is not enabled, skip insertion
+    if (existingItems && existingItems.length > 0 && !forceUpdate) {
       console.log('Menu items already exist in the database. Skipping insertion to avoid duplicates.');
-      console.log('If you want to re-insert items, first delete existing items from the Supabase dashboard.');
+      console.log('If you want to re-insert items, run this script with the --force flag.');
     } else {
+      // If force update is enabled and items exist, delete them first
+      if (existingItems && existingItems.length > 0 && forceUpdate) {
+        console.log('Force update enabled. Deleting existing menu items...');
+        
+        // Get all menu item IDs
+        const { data: allItems, error: fetchError } = await supabase
+          .from('menu_items')
+          .select('id');
+          
+        if (fetchError) {
+          console.error('Error fetching items to delete:', fetchError);
+          throw new Error(`Failed to fetch items for deletion: ${fetchError.message}`);
+        }
+        
+        if (allItems && allItems.length > 0) {
+          // Delete all items one by one
+          for (const item of allItems) {
+            const { error: deleteError } = await supabase
+              .from('menu_items')
+              .delete()
+              .eq('id', item.id);
+              
+            if (deleteError) {
+              console.error(`Error deleting item ${item.id}:`, deleteError);
+              throw new Error(`Failed to delete item ${item.id}: ${deleteError.message}`);
+            }
+          }
+          console.log(`Deleted ${allItems.length} existing menu items successfully.`);
+        } else {
+          console.log('No items found to delete.');
+        }
+      }
+      
       // Insert sample menu items
       console.log('Inserting sample menu items...');
       try {

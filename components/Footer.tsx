@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex flex-col items-start">
           <span className="text-xl font-bold flex items-center mb-1">
-            <span className="mr-2">🍝</span> Megan&apos;s Munchies
+            <span className="mr-2">🍝</span> Megan&apos;s Munchees
           </span>
           <span className="text-green text-sm mb-2">Fresh Off the Truck. Right on Time.</span>
           <span className="text-orange-700 font-semibold text-lg mt-2">ORDER NOW!</span>
@@ -23,7 +23,7 @@ export default function Footer() {
             <Link href="/order-history" className="hover:text-primary transition">Orders</Link>
             <Link href="/contact" className="hover:text-primary transition">Contact</Link>
           </nav>
-          <span className="text-xs text-navy/60">&copy; {new Date().getFullYear()} Megan&apos;s Munchies. All rights reserved.</span>
+          <span className="text-xs text-navy/60">&copy; {new Date().getFullYear()} Megan&apos;s Munchees. All rights reserved.</span>
         </div>
       </div>
     </footer>

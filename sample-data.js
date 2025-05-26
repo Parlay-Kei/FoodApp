@@ -121,6 +121,42 @@ export const sampleMenuItems = [
     is_gluten_free: false,
     available_today: true,
     quantity_available: 30
+  },
+  {
+    name: "Baked Chicken Wings",
+    description: "Deliciously seasoned baked chicken wings, crispy on the outside, juicy on the inside.",
+    price: 15.00, // Assuming $15 a plate applies to this as a combo
+    image_url: "/images/baked-chicken-wings.jpg", // Placeholder - replace with actual image URL
+    is_vegan: false,
+    is_vegetarian: false,
+    is_spicy: false,
+    is_gluten_free: true,
+    available_today: true,
+    quantity_available: 20
+  },
+  {
+    name: "Cornbread",
+    description: "Sweet and moist cornbread, a perfect side.",
+    price: 3.00, // Estimated price for a side
+    image_url: "/images/cornbread.jpg", // Placeholder - replace with actual image URL
+    is_vegan: false,
+    is_vegetarian: true,
+    is_spicy: false,
+    is_gluten_free: false,
+    available_today: true,
+    quantity_available: 30
+  },
+  {
+    name: "Red Beans and Rice w/Sausage",
+    description: "Hearty red beans and rice with savory sausage.",
+    price: 10.00, // Estimated price
+    image_url: "/images/red-beans-and-rice.jpg", // Placeholder - replace with actual image URL
+    is_vegan: false,
+    is_vegetarian: false,
+    is_spicy: false,
+    is_gluten_free: false,
+    available_today: true,
+    quantity_available: 15
   }
 ];
 
