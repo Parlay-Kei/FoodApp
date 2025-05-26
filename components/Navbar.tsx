@@ -63,7 +63,7 @@ export default function Navbar() {
           <div className="flex flex-col items-start justify-center">
             <Link href="/menu" className="flex items-center space-x-2">
               <span className="text-2xl font-bold text-white flex items-center">
-                <span className="mr-2">🚚</span> Megan's Munchies
+                <span className="mr-2">🚚</span> Megan&apos;s Munchies
               </span>
             </Link>
             <span className="text-sm text-green font-normal mt-1 ml-8">Fresh Off the Truck. Right on Time.</span>
