@@ -31,92 +31,22 @@ export default function Cart() {
   const router = useRouter();
   const supabase = createClientComponentClient();
 
-  // Function to load cart items from localStorage as a fallback
-  const loadCartFromLocalStorage = () => {
-    if (typeof window === 'undefined') return [];
-    
-    try {
-      const localCart = localStorage.getItem('cart');
-      if (localCart) {
-        return JSON.parse(localCart);
-      }
-    } catch (error) {
-      console.error('Error loading cart from localStorage:', error);
-    }
-    return [];
-  };
-  
-  // State for fallback cart items
-  const [fallbackItems, setFallbackItems] = useState([]);
-  // State to track if we're using the fallback
-  const [usingFallback, setUsingFallback] = useState(false);
-  
   useEffect(() => {
-    console.log('Cart page mounted, fetching cart items...');
     // Fetch cart items from the store
     fetchCart();
     generatePickupTimes();
-    
-    // Load fallback items from localStorage immediately
-    const localItems = loadCartFromLocalStorage();
-    if (localItems.length > 0) {
-      console.log('Loaded localStorage fallback for cart items:', localItems);
-      setFallbackItems(localItems);
-    }
   }, [fetchCart]);
   
-  // Check if we need to use fallback items
+  // Update service fee and total whenever subtotal changes
   useEffect(() => {
-    // If cart is empty after loading completes, use fallback if available
-    if (!cartLoading && cartItems.length === 0 && fallbackItems.length > 0) {
-      console.log('Using localStorage fallback items');
-      setUsingFallback(true);
-    } else if (cartItems.length > 0) {
-      // If we have real cart items, don't use fallback
-      setUsingFallback(false);
-    }
-  }, [cartItems, cartLoading, fallbackItems]);
-  
-  // Constants for calculations
-  const SERVICE_FEE_PERCENTAGE = 0.10;
-
-  // Helper function to calculate cart totals
-  const calculateCartTotals = (items) => {
-    try {
-      // Use reduce with proper decimal handling
-      const subtotal = items.reduce((total, item) => {
-        // Ensure price and quantity are valid numbers
-        const price = Number(item.price) || 0;
-        const quantity = Number(item.quantity) || 0;
-        return total + (price * quantity);
-      }, 0);
-      
-      // Calculate service fee with proper rounding to 2 decimal places
-      const fee = Math.round(subtotal * SERVICE_FEE_PERCENTAGE * 100) / 100;
-      const total = Math.round((subtotal + fee) * 100) / 100;
-      
-      return { subtotal, fee, total };
-    } catch (error) {
-      console.error('Error calculating cart totals:', error);
-      return { subtotal: 0, fee: 0, total: 0 };
-    }
-  };
-
-  // Update service fee and total whenever relevant data changes
-  useEffect(() => {
-    // Skip calculations if cart is still loading and not using fallback
-    if (cartLoading && !usingFallback) return;
+    const subtotalAmount = getSubtotal();
+    // Calculate service fee (10% of subtotal)
+    const feeAmount = subtotalAmount * 0.10;
+    setServiceFee(feeAmount);
     
-    // Determine which items to use for calculations
-    const itemsToUse = usingFallback ? fallbackItems : cartItems;
-    
-    // Calculate totals
-    const { subtotal, fee, total } = calculateCartTotals(itemsToUse);
-    
-    // Update state
-    setServiceFee(fee);
-    setTotal(total);
-  }, [cartLoading, cartItems, usingFallback, fallbackItems]);
+    // Calculate total
+    setTotal(subtotalAmount + feeAmount);
+  }, [getSubtotal, cartItems]);
 
   // Generate pickup times in 15-minute intervals for the next 3 hours
   const generatePickupTimes = () => {
@@ -148,23 +78,7 @@ export default function Cart() {
     try {
       // Ensure quantity is at least 1
       const quantity = Math.max(1, newQuantity);
-      
-      if (usingFallback) {
-        // Update in localStorage if using fallback
-        const updatedItems = fallbackItems.map(item => {
-          if (item.name === name || item.id === name) {
-            return { ...item, quantity };
-          }
-          return item;
-        });
-        
-        setFallbackItems(updatedItems);
-        localStorage.setItem('cart', JSON.stringify(updatedItems));
-        toast.success('Updated quantity');
-      } else {
-        // Use cart store if not using fallback
-        await updateCartQuantity(name, quantity);
-      }
+      await updateCartQuantity(name, quantity);
       
       // Service fee and total are updated via the useEffect hook
     } catch (error) {
@@ -176,24 +90,7 @@ export default function Cart() {
   // Remove item from cart
   const removeItem = async (name) => {
     try {
-      if (usingFallback) {
-        // Remove from localStorage if using fallback
-        const updatedItems = fallbackItems.filter(item => 
-          item.name !== name && item.id !== name
-        );
-        
-        setFallbackItems(updatedItems);
-        localStorage.setItem('cart', JSON.stringify(updatedItems));
-        toast.success('Item removed from cart');
-        
-        // If no items left, show empty cart
-        if (updatedItems.length === 0) {
-          setUsingFallback(false);
-        }
-      } else {
-        // Use cart store if not using fallback
-        await removeCartItem(name);
-      }
+      await removeCartItem(name);
       // Service fee and total are updated via the useEffect hook
     } catch (error) {
       console.error('Error removing item:', error);
@@ -208,22 +105,16 @@ export default function Cart() {
       return;
     }
     
-    // Get the items to use for checkout (either fallback or cart store)
-    const itemsToUse = usingFallback ? fallbackItems : cartItems;
-    
-    if (itemsToUse.length === 0) {
+    if (cartItems.length === 0) {
       toast.error('Your cart is empty');
       return;
     }
     
-    // If cart is still loading and not using fallback, wait
-    if (cartLoading && !usingFallback) {
+    // If cart is still loading, wait
+    if (cartLoading) {
       toast.error('Please wait while we load your cart');
       return;
     }
-    
-    // Recalculate totals to ensure consistency
-    const { total: calculatedTotal } = calculateCartTotals(itemsToUse);
     
     setLoading(true);
     
@@ -244,9 +135,8 @@ export default function Cart() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items: itemsToUse,
-          total: calculatedTotal, // Use the freshly calculated total
-          serviceFeePercentage: SERVICE_FEE_PERCENTAGE,
+          items: cartItems,
+          total: total,
           pickupTime: pickupTime
         }),
       });
@@ -257,16 +147,8 @@ export default function Cart() {
         throw new Error(result.error || 'An error occurred during checkout');
       }
       
-      // Clear cart based on which storage we're using
-      if (usingFallback) {
-        // Clear localStorage cart
-        localStorage.removeItem('cart');
-        setFallbackItems([]);
-        setUsingFallback(false);
-      } else {
-        // Clear cart using the cart store
-        await useCartStore.getState().clearCart();
-      }
+      // Clear cart using the cart store
+      await useCartStore.getState().clearCart();
       
       // Redirect to order confirmation page
       router.push(`/order-confirmation?id=${result.order.id}`);
@@ -291,7 +173,7 @@ export default function Cart() {
             <LoadingSpinner size={"medium"} />
             <p className="text-lg mt-4">Loading your cart...</p>
           </div>
-        ) : cartItems.length === 0 && !usingFallback ? (
+        ) : cartItems.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-lg mb-4">Your cart is empty</p>
             <button 
@@ -306,11 +188,11 @@ export default function Cart() {
             {/* Cart Items */}
             <div className="md:w-2/3">
               <div className="card divide-y">
-                {(usingFallback ? fallbackItems : cartItems).map(item => (
-                  <div key={item.name || item.id} className="p-4 flex">
+                {cartItems.map(item => (
+                  <div key={item.name} className="p-4 flex">
                     <div className="relative h-20 w-20 flex-shrink-0">
                       <Image 
-                        src={item.imageUrl || item.image || 'https://placehold.co/200x200?text=Food'} 
+                        src={item.imageUrl || 'https://placehold.co/200x200?text=Food'} 
                         alt={item.name}
                         fill
                         style={{ objectFit: 'cover' }}
@@ -366,9 +248,7 @@ export default function Cart() {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between items-center border-t pt-4">
                     <span className="font-semibold">Subtotal</span>
-                    <span>${usingFallback ? 
-                      calculateCartTotals(fallbackItems).subtotal.toFixed(2) : 
-                      getSubtotal().toFixed(2)}</span>
+                    <span>${getSubtotal().toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Service Fee (10%)</span>

@@ -1,74 +1,52 @@
 "use client";
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { toast } from 'react-hot-toast';
+import { useLogin } from '../../hooks/useLogin';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState('email'); // 'email' or 'phone'
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   
-  const router = useRouter();
+  const { login, sendMagicLink, cooldown, loading } = useLogin();
   const supabase = createClientComponentClient();
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success('Logged in successfully!');
-        router.push('/menu');
-        router.refresh();
-      }
-    } catch (error) {
-      toast.error('An error occurred during login');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    login(email, password);
   };
 
   const handleSendOTP = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (cooldown > 0) return; // still cooling off
     
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone,
-      });
+      const { error } = await supabase.auth.signInWithOtp({ phone });
       
       if (error) {
-        toast.error(error.message);
+        if (error.status === 429) {
+          // Just set cooldown without showing error
+          setCooldown(15);
+        } else {
+          toast.error(error.message);
+        }
       } else {
         toast.success('OTP sent to your phone!');
         setOtpSent(true);
       }
     } catch (error) {
       toast.error('An error occurred while sending OTP');
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (cooldown > 0) return; // still cooling off
     
     try {
       const { error } = await supabase.auth.verifyOtp({
@@ -78,7 +56,12 @@ export default function Login() {
       });
       
       if (error) {
-        toast.error(error.message);
+        if (error.status === 429) {
+          // Just set cooldown without showing error
+          setCooldown(15);
+        } else {
+          toast.error(error.message);
+        }
       } else {
         toast.success('Logged in successfully!');
         router.push('/menu');
@@ -86,16 +69,23 @@ export default function Login() {
       }
     } catch (error) {
       toast.error('An error occurred during verification');
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
+  
+  // Helper function to handle cooldown
+  const setCooldown = (seconds) => {
+    // This is a simplified version since we're not using the full hook in these methods
+    // In a real implementation, you might want to refactor to use the hook for all auth methods
+    window.localStorage.setItem('auth_cooldown', Date.now() + (seconds * 1000));
+    window.dispatchEvent(new Event('storage'));
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-gray-100 p-4">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6">Login to Food Truck</h1>
+        
+
         
         <div className="flex justify-center space-x-4 mb-6">
           <button 
@@ -147,10 +137,21 @@ export default function Login() {
             <button
               type="submit"
               className="btn-primary w-full"
-              disabled={loading}
+              disabled={loading || cooldown > 0}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {cooldown > 0 ? `Try again in ${cooldown}s` : loading ? 'Processing...' : 'Login'}
             </button>
+            
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Trouble signing in? <button 
+                type="button"
+                onClick={() => sendMagicLink(email)}
+                className="text-primary hover:underline"
+                disabled={!email || loading}
+              >
+                Send me a magic link
+              </button>
+            </p>
           </form>
         ) : (
           <div className="space-y-4">
@@ -174,9 +175,9 @@ export default function Login() {
                 <button
                   type="submit"
                   className="btn-primary w-full"
-                  disabled={loading}
+                  disabled={loading || cooldown > 0}
                 >
-                  {loading ? 'Sending...' : 'Send OTP'}
+                  {cooldown > 0 ? `Try again in ${cooldown}s` : loading ? 'Processing...' : 'Send OTP'}
                 </button>
               </form>
             ) : (
@@ -199,9 +200,9 @@ export default function Login() {
                 <button
                   type="submit"
                   className="btn-primary w-full mb-2"
-                  disabled={loading}
+                  disabled={loading || cooldown > 0}
                 >
-                  {loading ? 'Verifying...' : 'Verify OTP'}
+                  {cooldown > 0 ? `Try again in ${cooldown}s` : loading ? 'Processing...' : 'Verify OTP'}
                 </button>
                 
                 <button

@@ -5,6 +5,7 @@ import FoodCard from './FoodCard';
 import CartDrawer from './CartDrawer';
 import HeroMenuHeader from './HeroMenuHeader';
 import NavTabs from './NavTabs';
+import LiveLocationBanner from './LiveLocationBanner';
 import { useCartStore } from './cartStore';
 
 const DUMMY_MENU = [
@@ -67,9 +68,10 @@ const MenuPage: React.FC = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background dark:bg-dark-background text-text dark:text-dark-text transition-colors duration-200">
       <HeroMenuHeader />
       <NavTabs />
+      <LiveLocationBanner />
       
       <main className="max-w-7xl mx-auto px-4 py-6 pb-32">
         {/* Category filters */}
@@ -80,8 +82,8 @@ const MenuPage: React.FC = () => {
               onClick={() => setActive(filter)}
               className={`px-4 py-1.5 rounded-full border font-medium text-sm whitespace-nowrap transition duration-200 ${
                 active === filter
-                  ? 'bg-gradient-to-r from-secondary to-primary text-white border-transparent shadow-sm'
-                  : 'bg-white text-text/80 border-primary/20 hover:bg-primary/5'
+                  ? 'bg-gradient-to-r from-primary to-secondary text-white border-transparent shadow-sm'
+                  : 'bg-white dark:bg-dark-background/50 text-text/80 dark:text-dark-text/80 border-primary/20 dark:border-dark-primary/20 hover:bg-primary/5 dark:hover:bg-dark-primary/5'
               }`}
             >
               {filter}
@@ -94,7 +96,7 @@ const MenuPage: React.FC = () => {
           {menuByCategory.map(({ category, items }) => (
             items.length > 0 && (
               <section key={category}>
-                <h2 className="font-display text-2xl font-semibold text-primary mb-4">
+                <h2 className="font-display text-2xl font-semibold text-primary dark:text-dark-primary mb-4">
                   {category}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -106,7 +108,12 @@ const MenuPage: React.FC = () => {
                       description={item.description}
                       tags={item.tags}
                       price={item.price}
-                      onAdd={() => addItem({ name: item.name, price: item.priceNum })}
+                      onAdd={() => addItem({
+                        name: item.name,
+                        price: item.priceNum,
+                        imageUrl: item.imageUrl,
+                        description: item.description
+                      })}
                     />
                   ))}
                 </div>

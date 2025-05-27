@@ -1,0 +1,34 @@
+# This is a template for your Supabase project configuration
+# You would typically use this file with the Supabase CLI
+
+[auth]
+# Configure auth providers and email settings
+site_url = "http://localhost:3000"
+# When deploying, change this to your production URL
+# site_url = "https://your-production-url.com"
+
+# URLs that auth redirects to
+additional_redirect_urls = ["https://localhost:3000", "https://localhost:3000/login"]
+
+[auth.email]
+# Enable email confirmations
+enable_confirmations = true
+
+# Configure SMTP for email delivery
+[auth.email.smtp]
+enabled = true
+host = "smtp.example.com"
+port = 587
+user = "your-smtp-username"
+pass = "your-smtp-password"
+sender_name = "Food App"
+# Use your actual support email here
+sender_email = "noreply@example.com"
+
+# Configure email templates
+[auth.email.templates]
+confirmation = "Your confirmation link is: {{ .ConfirmationURL }}"
+recovery = "Your password reset link is: {{ .RecoveryURL }}"
+magic_link = "Your magic link is: {{ .MagicLink }}"
+email_change = "Your email change confirmation link is: {{ .EmailChangeURL }}"
+invite = "You have been invited to join Food App. Please sign up using this link: {{ .InviteURL }}"

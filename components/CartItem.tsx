@@ -1,68 +1,115 @@
-import Image from 'next/image';
+'use client';
 
-export interface CartItemType {
-  id: string;
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { useCartStore } from './cartStore';
+import LoadingSpinner from './LoadingSpinner';
+import { toast } from 'react-hot-toast';
+
+interface CartItemProps {
   name: string;
   price: number;
   quantity: number;
-  max_quantity: number;
-  image?: string;
+  imageUrl?: string;
+  description?: string;
 }
 
-interface CartItemProps {
-  item: CartItemType;
-  onUpdateQuantity: (id: string, newQuantity: number) => void;
-  onRemove: (id: string) => void;
-}
+const CartItem: React.FC<CartItemProps> = ({
+  name,
+  price,
+  quantity,
+  imageUrl,
+  description,
+}) => {
+  const { updateQuantity, removeItem, isLoading, error } = useCartStore();
+  const [localLoading, setLocalLoading] = useState(false);
+  const [operationType, setOperationType] = useState<'increase' | 'decrease' | 'remove' | null>(null);
 
-export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
+  const handleQuantityChange = async (newQuantity: number) => {
+    try {
+      setLocalLoading(true);
+      setOperationType(newQuantity > quantity ? 'increase' : 'decrease');
+      await updateQuantity(name, newQuantity);
+      if (newQuantity > quantity) {
+        toast.success(`Added one more ${name} to cart`);
+      }
+    } catch (err) {
+      // Error is handled by the cart store and displayed in CartDrawer
+    } finally {
+      setLocalLoading(false);
+      setOperationType(null);
+    }
+  };
+
+  const handleRemove = async () => {
+    try {
+      setLocalLoading(true);
+      setOperationType('remove');
+      await removeItem(name);
+    } catch (err) {
+      // Error is handled by the cart store and displayed in CartDrawer
+    } finally {
+      setLocalLoading(false);
+      setOperationType(null);
+    }
+  };
+
   return (
-    <div className="p-4 flex">
-      <div className="relative h-20 w-20 flex-shrink-0">
-        <Image 
-          src={item.image || 'https://placehold.co/200x200?text=Food'} 
-          alt={item.name}
-          fill
-          style={{ objectFit: 'cover' }}
-          className="rounded"
-        />
-      </div>
+    <div className="flex items-center gap-4 p-4 bg-white dark:bg-dark-background/50 rounded-lg shadow-sm">
+      {imageUrl && (
+        <div className="relative w-20 h-20 flex-shrink-0">
+          <Image
+            src={imageUrl}
+            alt={name}
+            fill
+            className="object-cover rounded-md"
+            sizes="80px"
+          />
+        </div>
+      )}
       
-      <div className="ml-4 flex-grow">
-        <div className="flex justify-between">
-          <h3 className="font-medium">{item.name}</h3>
-          <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+      <div className="flex-grow min-w-0">
+        <h3 className="font-medium text-text dark:text-dark-text truncate">{name}</h3>
+        {description && (
+          <p className="text-sm text-text/70 dark:text-dark-text/70 truncate">{description}</p>
+        )}
+        <div className="mt-1 text-primary dark:text-dark-primary font-medium">
+          ${price.toFixed(2)}
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => handleQuantityChange(quantity - 1)}
+          disabled={isLoading || localLoading || quantity <= 1}
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/10 dark:bg-dark-primary/10 text-primary dark:text-dark-primary hover:bg-primary/20 dark:hover:bg-dark-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Decrease quantity"
+        >
+          {(isLoading || (localLoading && operationType === 'decrease')) ? <LoadingSpinner size="xs" /> : '-'}
+        </button>
         
-        <p className="text-sm text-gray-500">${item.price.toFixed(2)} each</p>
+        <span className="w-8 text-center font-medium">{quantity}</span>
         
-        <div className="flex justify-between items-center mt-2">
-          <div className="flex items-center border rounded">
-            <button 
-              onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-              className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-              disabled={item.quantity <= 1}
-            >
-              -
-            </button>
-            <span className="px-2 py-1">{item.quantity}</span>
-            <button 
-              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-              className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-              disabled={item.quantity >= item.max_quantity}
-            >
-              +
-            </button>
-          </div>
-          
-          <button 
-            onClick={() => onRemove(item.id)}
-            className="text-sm text-red-500 hover:text-red-700"
-          >
-            Remove
-          </button>
-        </div>
+        <button
+          onClick={() => handleQuantityChange(quantity + 1)}
+          disabled={isLoading || localLoading}
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/10 dark:bg-dark-primary/10 text-primary dark:text-dark-primary hover:bg-primary/20 dark:hover:bg-dark-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Increase quantity"
+        >
+          {(isLoading || (localLoading && operationType === 'increase')) ? <LoadingSpinner size="xs" /> : '+'}
+        </button>
+
+        <button
+          onClick={handleRemove}
+          disabled={isLoading || localLoading}
+          className="ml-2 p-2 text-red-500 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Remove item"
+        >
+          {(isLoading || (localLoading && operationType === 'remove')) ? <LoadingSpinner size="xs" /> : '×'}
+        </button>
       </div>
     </div>
   );
-} 
+};
+
+export default CartItem;

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useCartStore } from './cartStore';
 
 interface User {
   id: string;
@@ -34,18 +35,18 @@ export default function Navbar() {
     checkUser();
   }, [supabase]);
 
+  // Use the cart store for cart count
+  const { items, itemCount, fetchCart } = useCartStore();
+  
   useEffect(() => {
-    const updateCartCount = () => {
-      const cart = typeof window !== 'undefined' && localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart') as string) : [];
-      const count = cart.reduce((total: number, item: { quantity: number }) => total + item.quantity, 0);
-      setCartCount(count);
-    };
-    updateCartCount();
-    window.addEventListener('storage', updateCartCount);
-    return () => {
-      window.removeEventListener('storage', updateCartCount);
-    };
-  }, []);
+    // Fetch cart items when component mounts
+    fetchCart();
+  }, [fetchCart]);
+  
+  // Update cart count whenever items change
+  useEffect(() => {
+    setCartCount(itemCount());
+  }, [items, itemCount]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

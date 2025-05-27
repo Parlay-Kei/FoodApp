@@ -30,15 +30,25 @@ export default function Signup() {
     setLoading(true);
     
     try {
+      // Log the redirect URL for debugging
+      const redirectUrl = `${window.location.origin}/login`;
+      console.log('Email redirect URL:', redirectUrl);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/login`,
+          emailRedirectTo: redirectUrl,
+          data: {
+            name: email.split('@')[0], // Use part of email as name
+          }
         },
       });
       
+      console.log('Signup response:', data);
+      
       if (error) {
+        console.error('Signup error:', error);
         toast.error(error.message);
       } else {
         // Create profile entry
@@ -58,8 +68,17 @@ export default function Signup() {
           }
         }
         
-        toast.success('Signup successful! Please check your email for verification.');
-        router.push('/login');
+        // Check if email confirmation is required
+        if (data?.user?.identities?.length === 0) {
+          toast.error('This email is already registered. Please log in or use a different email.');
+        } else if (data?.user?.confirmed_at) {
+          toast.success('Signup successful! You can now log in.');
+          router.push('/login');
+        } else {
+          toast.success('Signup successful! Please check your email for the confirmation link.');
+          toast.info('If you don\'t see the email, check your spam folder.');
+          router.push('/login');
+        }
       }
     } catch (error) {
       toast.error('An error occurred during signup');
